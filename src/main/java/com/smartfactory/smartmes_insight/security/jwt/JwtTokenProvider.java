@@ -1,4 +1,4 @@
-package com.smartfactory.smartmes_insight.security;
+package com.smartfactory.smartmes_insight.security.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;

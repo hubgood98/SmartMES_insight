@@ -49,6 +49,15 @@
 
 ---
 
+	•	users – 사용자 (관리자/작업자 구분)
+	•	facilities – 설비 정보
+	•	sensors – 설비별 센서 항목 (온도, 전류, 속도 등)
+	•	sensor_logs – 수집된 센서 데이터 로그
+	•	alerts – 이상 감지 로그
+	•	work_orders – 작업 지시 정보
+	•	production_results – 실적 및 불량 등록 정보
+	•	log_entries – 시스템 내 모든 활동 이력 기록
+
 ---
 
 ## 🧪 실행 방법
