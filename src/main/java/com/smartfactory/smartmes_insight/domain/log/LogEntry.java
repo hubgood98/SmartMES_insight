@@ -1,6 +1,6 @@
 package com.smartfactory.smartmes_insight.domain.log;
 
-import com.smartfactory.smartmes.domain.user.User;
+import com.smartfactory.smartmes_insight.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
 
