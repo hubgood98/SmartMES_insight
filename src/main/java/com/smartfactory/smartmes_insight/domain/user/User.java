@@ -8,7 +8,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "users")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -29,4 +28,13 @@ public class User {
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
+
+    //pw변경
+    public void changePassword(String rawNewPassword) {
+        this.password = rawNewPassword;
+    }
+
+    public void changeRole(Role role) {
+        this.role = role;
+    }
 }

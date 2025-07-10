@@ -1,6 +1,6 @@
 package com.smartfactory.smartmes_insight.domain.production;
 
-import com.smartfactory.smartmes.domain.workorder.WorkOrder;
+import com.smartfactory.smartmes_insight.domain.workorder.WorkOrder;
 import jakarta.persistence.*;
 import lombok.*;
 

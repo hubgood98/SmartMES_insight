@@ -8,10 +8,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "facilities")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
 public class Facility {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,6 +24,21 @@ public class Facility {
     @Column(nullable = false, length = 20)
     private String status;
 
-    @Column(name = "created_at", nullable = false)
+    @Column(length = 200)
+    private String description;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate(){
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public void updateInfo(Facility updatedFacility){
+        this.name = updatedFacility.getName();
+        this.location = updatedFacility.getLocation();
+        this.status = updatedFacility.getStatus();
+        this.description = updatedFacility.getDescription();
+    }
 }

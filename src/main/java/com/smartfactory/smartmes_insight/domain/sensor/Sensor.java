@@ -1,6 +1,6 @@
 package com.smartfactory.smartmes_insight.domain.sensor;
 
-import com.smartfactory.smartmes.domain.facility.Facility;
+import com.smartfactory.smartmes_insight.domain.facility.Facility;
 import jakarta.persistence.*;
 import lombok.*;
 
