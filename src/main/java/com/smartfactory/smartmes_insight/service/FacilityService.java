@@ -22,11 +22,13 @@ public class FacilityService {
     }
 
     // 설비 전체 조회
+    @Transactional(readOnly = true)
     public List<Facility> findAll() {
         return facilityRepository.findAll();
     }
 
     // 설비 단건 조회
+    @Transactional(readOnly = true)
     public Optional<Facility> findById(Long id) {
         return facilityRepository.findById(id);
     }
@@ -42,6 +44,12 @@ public class FacilityService {
     // 설비 삭제
     public void deleteById(Long id) {
         facilityRepository.deleteById(id);
+    }
+    
+    // 🔍 설비 엔티티 직접 조회 (서비스간 통신용)
+    public Facility findEntityById(Long id) {
+        return facilityRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("설비를 찾을 수 없습니다."));
     }
 
 }
