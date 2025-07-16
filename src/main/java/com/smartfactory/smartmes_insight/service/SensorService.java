@@ -7,12 +7,11 @@ import com.smartfactory.smartmes_insight.dto.SensorResponse;
 import com.smartfactory.smartmes_insight.dto.SensorCreateRequest;
 import com.smartfactory.smartmes_insight.dto.SensorUpdateRequest;
 import com.smartfactory.smartmes_insight.dto.SensorSettingsRequest;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
@@ -97,22 +96,16 @@ public class SensorService {
     public SensorResponse updateSensorSettings(Long sensorId, SensorSettingsRequest request) {
         // 1. 입력 검증
         request.validate();
-        
         // 2. 센서 조회
         Sensor sensor = findSensorOrThrow(sensorId);
-        
         // 3. 설정값만 업데이트
         sensor.updateThresholds(request.getThresholdMin(), request.getThresholdMax());
-        
         // 4. 추가 설정들 (향후 확장 가능)
         // sensor.updateSamplingRate(request.getSamplingRate());
         // sensor.updateCalibration(request.getCalibrationValue());
         
         return SensorResponse.from(sensor);
     }
-
-    // 🔧 내부 헬퍼 메서드들 (중복 제거)
-    
     /**
      * 센서 조회 또는 예외 발생
      */
