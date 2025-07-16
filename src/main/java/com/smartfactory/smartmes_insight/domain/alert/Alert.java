@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "alerts")
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

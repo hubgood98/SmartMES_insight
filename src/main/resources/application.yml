@@ -13,6 +13,6 @@ spring:
       hibernate.format_sql: true
     database-platform: org.hibernate.dialect.MySQL8Dialect
 
-  jwt:
-    secret: YWJjZGVmZ2hpamtsbW5vcHFyc3R1dnd4eXo=
-    expiration: 3600000   # 1시간 (ms)
+jwt:
+  secret: c2VjdXJlLXNlY3JldC1zZWNyZXQtc2VjcmV0LXNlY3JldC1zZWNyZXQ=
+  expiration: 3600000   # 1시간 (ms)
