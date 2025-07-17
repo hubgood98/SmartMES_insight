@@ -180,4 +180,12 @@ public class SensorService {
         Sensor sensor = findSensorOrThrow(sensorId);
         return sensor.hasThresholds();
     }
+    
+    /**
+     * 활성화된 센서 ID 목록 조회 (스케줄러용)
+     */
+    @Transactional(readOnly = true)
+    public List<Long> findActiveSensorIds() {
+        return sensorRepository.findAllActiveSensorIds();
+    }
 }

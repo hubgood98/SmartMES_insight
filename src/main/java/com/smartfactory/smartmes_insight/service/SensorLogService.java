@@ -39,6 +39,11 @@ public class SensorLogService {
 
         return sensorLogRepository.save(sensorLog);
     }
+    
+    // 센서 데이터 로깅 (스케줄러용 별칭)
+    public SensorLog logSensorData(Long sensorId, Double value) {
+        return saveSensorData(sensorId, value);
+    }
 
     // 특정 기간 센서 로그 조회
     @Transactional(readOnly = true)
