@@ -317,4 +317,44 @@ public class User {
                 username, 
                 isActive() ? "활성" : "비활성");
     }
+    
+    // ========================= UserService에서 필요한 메서드들 =========================
+    
+    /**
+     * 실명 변경
+     */
+    public void updateRealName(String realName) {
+        if (realName != null && !realName.trim().isEmpty()) {
+            if (realName.trim().length() < 2) {
+                throw new IllegalArgumentException("실명은 최소 2자 이상이어야 합니다.");
+            }
+            this.realName = realName.trim();
+            this.updatedAt = LocalDateTime.now();
+        }
+    }
+    
+    /**
+     * 부서 변경
+     */
+    public void updateDepartment(String department) {
+        if (department != null) {
+            this.department = department.trim().isEmpty() ? null : department.trim();
+            this.updatedAt = LocalDateTime.now();
+        }
+    }
+    
+    @PrePersist
+    protected void onCreate() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createdAt = now;
+        this.updatedAt = now;
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+    }
+    
+    @PreUpdate  
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
 }

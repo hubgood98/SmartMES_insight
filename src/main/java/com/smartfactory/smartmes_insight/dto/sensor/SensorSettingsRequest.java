@@ -1,23 +1,26 @@
-package com.smartfactory.smartmes_insight.dto;
+package com.smartfactory.smartmes_insight.dto.sensor;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Schema(description = "센서 설정 요청 DTO")
 public class SensorSettingsRequest {
     
     // 임계값 설정
     @DecimalMin(value = "0.0", message = "최소 임계값은 0 이상이어야 합니다")
+    @Schema(description = "최소 임계값", example = "60.0")
     private Double thresholdMin;
     
     @DecimalMin(value = "0.0", message = "최대 임계값은 0 이상이어야 합니다")
+    @Schema(description = "최대 임계값", example = "80.0")
     private Double thresholdMax;
     
     // 🔧 향후 확장 가능한 설정들 (주석 처리)

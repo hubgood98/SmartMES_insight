@@ -3,10 +3,7 @@ package com.smartfactory.smartmes_insight.service;
 import com.smartfactory.smartmes_insight.domain.sensor.Sensor;
 import com.smartfactory.smartmes_insight.domain.sensor.SensorRepository;
 import com.smartfactory.smartmes_insight.domain.facility.Facility;
-import com.smartfactory.smartmes_insight.dto.SensorResponse;
-import com.smartfactory.smartmes_insight.dto.SensorCreateRequest;
-import com.smartfactory.smartmes_insight.dto.SensorUpdateRequest;
-import com.smartfactory.smartmes_insight.dto.SensorSettingsRequest;
+import com.smartfactory.smartmes_insight.dto.sensor.*;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -73,6 +70,15 @@ public class SensorService {
                 .stream()
                 .map(SensorResponse::from)
                 .toList();
+    }
+
+    /**
+     * 센서 단건 조회
+     */
+    @Transactional(readOnly = true)
+    public SensorResponse getSensorById(Long id) {
+        Sensor sensor = findSensorOrThrow(id);
+        return SensorResponse.from(sensor);
     }
 
     // 3️⃣ 특정 설비에 연결된 센서 조회

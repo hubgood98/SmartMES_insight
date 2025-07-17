@@ -3,6 +3,9 @@ package com.smartfactory.smartmes_insight.service;
 import com.smartfactory.smartmes_insight.domain.user.Role;
 import com.smartfactory.smartmes_insight.domain.user.User;
 import com.smartfactory.smartmes_insight.domain.user.UserRepository;
+import com.smartfactory.smartmes_insight.dto.user.UserCreateRequest;
+import com.smartfactory.smartmes_insight.dto.user.UserResponse;
+import com.smartfactory.smartmes_insight.dto.user.UserUpdateRequest;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -57,6 +60,153 @@ public class UserService {
                 .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + userId));
     }
     
+    // ========================= Controller용 메서드들 =========================
+    
+    /**
+     * 사용자 생성 (DTO 기반)
+     */
+    public UserResponse createUser(UserCreateRequest request) {
+        // 1. 사용자명 중복 확인
+        if (userRepository.existsByUsername(request.getUsername())) {
+            throw new IllegalArgumentException("이미 존재하는 사용자명입니다: " + request.getUsername());
+        }
+        
+        // 2. 이메일 중복 확인
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new IllegalArgumentException("이미 존재하는 이메일입니다: " + request.getEmail());
+        }
+        
+        // 3. 비밀번호 암호화
+        String encodedPassword = passwordEncoder.encode(request.getPassword());
+        
+        // 4. User 엔티티 생성
+        User user = User.builder()
+                .username(request.getUsername())
+                .password(encodedPassword)
+                .email(request.getEmail())
+                .realName(request.getRealName())
+                .role(Role.valueOf(request.getRole()))
+                .phone(request.getPhone())
+                .department(request.getDepartment())
+                .active(true)
+                .build();
+        
+        // 5. 저장 후 DTO 변환
+        User savedUser = save(user);
+        return UserResponse.from(savedUser);
+    }
+    
+    /**
+     * 전체 사용자 조회 (DTO 기반)
+     */
+    @Transactional(readOnly = true)
+    public List<UserResponse> getAllUsers() {
+        return findAll().stream()
+                .map(UserResponse::from)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 사용자 상세 조회 (DTO 기반)
+     */
+    @Transactional(readOnly = true)
+    public UserResponse getUserById(Long id) {
+        User user = getUserOrThrow(id);
+        return UserResponse.from(user);
+    }
+    
+    /**
+     * 사용자명으로 조회 (DTO 기반)
+     */
+    @Transactional(readOnly = true)
+    public UserResponse getUserByUsername(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + username));
+        return UserResponse.from(user);
+    }
+    
+    /**
+     * 역할별 사용자 조회 (DTO 기반)
+     */
+    @Transactional(readOnly = true)
+    public List<UserResponse> getUsersByRole(String role) {
+        Role roleEnum = Role.valueOf(role);
+        return userRepository.findByRole(roleEnum).stream()
+                .map(UserResponse::from)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 활성 사용자 조회 (DTO 기반)
+     */
+    @Transactional(readOnly = true)
+    public List<UserResponse> getActiveUsers() {
+        return findAll().stream()
+                .filter(User::isActive)
+                .map(UserResponse::from)
+                .collect(Collectors.toList());
+    }
+    
+    /**
+     * 사용자 정보 수정 (DTO 기반)
+     */
+    public UserResponse updateUser(Long id, UserUpdateRequest request) {
+        User user = getUserOrThrow(id);
+        
+        // 선택적 업데이트
+        if (request.getPassword() != null) {
+            String encodedPassword = passwordEncoder.encode(request.getPassword());
+            user.changePassword(encodedPassword);
+        }
+        if (request.getEmail() != null) {
+            updateUserEmail(id, request.getEmail());
+        }
+        if (request.getRealName() != null) {
+            user.updateRealName(request.getRealName());
+        }
+        if (request.getRole() != null) {
+            user.changeRole(Role.valueOf(request.getRole()));
+        }
+        if (request.getPhone() != null) {
+            user.updatePhone(request.getPhone());
+        }
+        if (request.getDepartment() != null) {
+            user.updateDepartment(request.getDepartment());
+        }
+        if (request.getActive() != null) {
+            if (request.getActive()) {
+                user.activate();
+            } else {
+                user.deactivate();
+            }
+        }
+        
+        return UserResponse.from(user);
+    }
+    
+    /**
+     * 사용자 삭제
+     */
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new EntityNotFoundException("사용자를 찾을 수 없습니다: " + id);
+        }
+        userRepository.deleteById(id);
+    }
+    
+    /**
+     * 사용자 상태 토글 (활성화/비활성화)
+     */
+    public UserResponse toggleUserStatus(Long id) {
+        User user = getUserOrThrow(id);
+        if (user.isActive()) {
+            user.deactivate();
+        } else {
+            user.activate();
+        }
+        return UserResponse.from(user);
+    }
+
     // ========================= 알림 시스템용 메서드들 =========================
     
     /**
