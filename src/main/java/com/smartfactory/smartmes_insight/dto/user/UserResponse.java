@@ -52,12 +52,12 @@ public class UserResponse {
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .realName(user.getRealName())
-                .role(user.getRole())
+                .role(String.valueOf(user.getRole()))
                 .phone(user.getPhone())
                 .department(user.getDepartment())
-                .active(user.getActive())
-                .createdDate(user.getCreatedDate())
-                .updatedDate(user.getUpdatedDate())
+                .active(user.getIsActive())
+                .createdDate(user.getCreatedAt())
+                .updatedDate(user.getUpdatedAt())
                 .build();
     }
 }

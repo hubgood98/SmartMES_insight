@@ -50,10 +50,9 @@ public class FacilityResponse {
                 .type(facility.getType())
                 .location(facility.getLocation())
                 .status(facility.getStatus())
-                .specifications(facility.getSpecifications())
                 .description(facility.getDescription())
-                .createdDate(facility.getCreatedDate())
-                .updatedDate(facility.getUpdatedDate())
+                .createdDate(facility.getCreatedAt())
+                .updatedDate(facility.getUpdatedAt())
                 .build();
     }
 }

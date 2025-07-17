@@ -88,7 +88,7 @@ public class UserService {
                 .role(Role.valueOf(request.getRole()))
                 .phone(request.getPhone())
                 .department(request.getDepartment())
-                .active(true)
+                .isActive(true)
                 .build();
         
         // 5. 저장 후 DTO 변환
