@@ -8,8 +8,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "facilities")
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Facility {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +19,9 @@ public class Facility {
 
     @Column(nullable = false, length = 100)
     private String name;
+
+    @Column(length = 50)
+    private String type;
 
     @Column(length = 100)
     private String location;
@@ -37,6 +42,7 @@ public class Facility {
 
     public void updateInfo(Facility updatedFacility){
         this.name = updatedFacility.getName();
+        this.type = updatedFacility.getType();
         this.location = updatedFacility.getLocation();
         this.status = updatedFacility.getStatus();
         this.description = updatedFacility.getDescription();

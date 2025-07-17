@@ -30,4 +30,7 @@ public class ProductionResult {
 
     @Column(name = "recorded_at", nullable = false)
     private LocalDateTime recordedAt;
+
+    @Column(name = "memo", length = 1000)
+    private String memo;
 }
