@@ -33,4 +33,12 @@ public class WorkOrder {
 
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    
+    @Column(name = "created_date", nullable = false)
+    private LocalDateTime createdDate;
+    
+    @PrePersist
+    protected void onCreate() {
+        this.createdDate = LocalDateTime.now();
+    }
 }
