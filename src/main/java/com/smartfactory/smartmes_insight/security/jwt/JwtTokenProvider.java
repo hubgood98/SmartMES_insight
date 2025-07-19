@@ -7,10 +7,14 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
 import java.util.Base64;
+import java.util.Collections;
 import java.util.Date;
 
 @Component
@@ -73,5 +77,22 @@ public class JwtTokenProvider {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
+    }
+    
+    // 토큰에서 Authentication 객체 생성
+    public Authentication getAuthentication(String token) {
+        String username = getUsername(token);
+        String role = getRole(token);
+        
+        // Spring Security의 권한은 "ROLE_" 접두사가 필요
+        SimpleGrantedAuthority authority = new SimpleGrantedAuthority("ROLE_" + role);
+        
+        // Authentication 객체 생성
+        // principal: 사용자명, credentials: null (이미 인증됨), authorities: 권한 목록
+        return new UsernamePasswordAuthenticationToken(
+                username,
+                null,
+                Collections.singletonList(authority)
+        );
     }
 }
