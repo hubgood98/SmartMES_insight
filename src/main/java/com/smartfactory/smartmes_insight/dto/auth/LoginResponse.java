@@ -1,60 +1,44 @@
 package com.smartfactory.smartmes_insight.dto.auth;
 
-import io.swagger.v3.oas.annotations.media.Schema;
+import com.smartfactory.smartmes_insight.domain.user.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
-@Schema(description = "로그인 응답 DTO")
+@NoArgsConstructor
 public class LoginResponse {
 
-    @Schema(description = "JWT 액세스 토큰", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
+    // 🔐 인증 정보
     private String accessToken;
-
-    @Schema(description = "JWT 리프레시 토큰", example = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...")
     private String refreshToken;
-
-    @Schema(description = "토큰 타입", example = "Bearer")
-    private String tokenType = "Bearer";
-
-    @Schema(description = "토큰 만료 시간 (초)", example = "3600")
     private Long expiresIn;
 
-    @Schema(description = "사용자 정보")
-    private UserInfo userInfo;
+    // 👤 사용자 기본 정보 (userId 제거!)
+    private String username;
+    private String name;
+    private Role role;
 
-    @Schema(description = "로그인 시간", example = "2025-01-20T10:30:00")
-    private LocalDateTime loginTime;
+    // 🏭 작업 환경 정보
+    private List<Long> accessibleFacilityIds;
+    private String currentShift;
+    private String department;
 
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    @Schema(description = "로그인 사용자 정보")
-    public static class UserInfo {
-        @Schema(description = "사용자 ID", example = "1")
-        private Long id;
+    // 📊 대시보드 설정
+    private List<String> permissions;
 
-        @Schema(description = "사용자명", example = "john_doe")
-        private String username;
+    // 🔔 실시간 알림 설정
+    private boolean alertEnabled;
+    private List<String> alertTypes;
 
-        @Schema(description = "실명", example = "홍길동")
-        private String realName;
-
-        @Schema(description = "역할", example = "OPERATOR")
-        private String role;
-
-        @Schema(description = "이메일", example = "john@example.com")
-        private String email;
-
-        @Schema(description = "부서", example = "생산부")
-        private String department;
-    }
+    // 📝 추가 메타데이터
+    private LocalDateTime lastLoginTime;
+    private String message;
+    private boolean passwordChangeRequired;
 }
