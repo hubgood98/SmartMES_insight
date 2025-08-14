@@ -34,6 +34,8 @@ public class SecurityConfig {
                         ).permitAll()
                         // 공개 API
                         .requestMatchers("/api/public/**").permitAll()
+                        .requestMatchers("/api/auth/login").permitAll() // 로그인 공개
+                        .requestMatchers("/api/auth/refresh").permitAll() // 토큰 갱신 공개
                         // 권한별 접근 제어
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/manager/**").hasAnyRole("ADMIN", "MANAGER")

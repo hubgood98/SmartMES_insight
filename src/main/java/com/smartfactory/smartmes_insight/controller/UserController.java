@@ -35,6 +35,16 @@ public class UserController {
                 .body(ApiResponse.created(user, "사용자가 성공적으로 생성되었습니다."));
     }
 
+    @Operation(summary = "사용자 회원가입", description = "새로운 사용자를 등록합니다. (ADMIN 권한 필요)")
+    @PostMapping("/register")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<UserResponse>> registerUser(
+            @Valid @RequestBody @Parameter(description = "사용자 회원가입 요청 데이터") UserCreateRequest request) {
+        UserResponse user = userService.createUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.created(user, "사용자가 성공적으로 생성되었습니다."));
+    }
+
     @Operation(summary = "전체 사용자 조회", description = "모든 사용자 목록을 조회합니다. (ADMIN, MANAGER 권한 필요)")
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
