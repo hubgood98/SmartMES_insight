@@ -9,13 +9,13 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
     
-    Optional<User> findByUsername(String username);
+    User findByUsername(String username);
     
     // 사용자명 존재 여부 확인
     boolean existsByUsername(String username);
     
     // 이메일 조회 (중복 검증용)
-    Optional<User> findByEmail(String email);
+    User findByEmail(String email);
     
     // 이메일 존재 여부 확인
     boolean existsByEmail(String email);

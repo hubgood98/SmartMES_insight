@@ -12,8 +12,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -43,12 +43,19 @@ public class UserService {
     }
 
     //이 메서드는 외부 서비스 메서드나 테스트 등에 활용할거임
-    public Optional<User> findById(Long id) {
-        return userRepository.findById(id);
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + id));
     }
 
-    public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User findByUsername(String username) {
+
+        User user = userRepository.findByUsername(username);
+        if(user == null) {
+           throw new EntityNotFoundException("사용자를 찾을 수 없습니다: " + username);
+        }
+        return user;
+
     }
 
     public List<User> findAll() {
@@ -120,8 +127,7 @@ public class UserService {
      */
     @Transactional(readOnly = true)
     public UserResponse getUserByUsername(String username) {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new EntityNotFoundException("사용자를 찾을 수 없습니다: " + username));
+        User user = findByUsername(username);
         return UserResponse.from(user);
     }
     
@@ -327,9 +333,13 @@ public class UserService {
         // 🔍 이메일 중복 검증 (도메인 레벨에서는 불가능한 검증)
         if (email != null && !email.trim().isEmpty()) {
             String normalizedEmail = email.trim().toLowerCase();
-            Optional<User> existingUser = userRepository.findByEmail(normalizedEmail);
-            if (existingUser.isPresent() && !existingUser.get().getId().equals(userId)) {
-                throw new IllegalStateException("이미 사용 중인 이메일입니다: " + normalizedEmail);
+            try {
+                User existingUser = userRepository.findByEmail(normalizedEmail);
+                if (existingUser != null && !existingUser.getId().equals(userId)) {
+                    throw new IllegalStateException("이미 사용 중인 이메일입니다: " + normalizedEmail);
+                }
+            } catch (Exception e) {
+                // 이메일로 사용자를 찾지 못한 경우는 정상 (중복이 아님)
             }
         }
         
@@ -383,4 +393,91 @@ public class UserService {
         adminIds.addAll(managerIds);
         return adminIds;
     }
+
+    // ========================= 인증 시스템용 메서드들 =========================
+    
+    /**
+     * 마지막 로그인 시간 갱신
+     * 로그인 성공 시 User.lastLoginTime 필드를 현재 시간으로 업데이트
+     * 
+     * @param userId 사용자 ID
+     */
+    public void updateLastLoginTime(Long userId) {
+        User user = getUserOrThrow(userId);
+        // User 엔티티에 lastLoginTime 필드 업데이트를 위한 새로운 메서드 호출
+        // User 엔티티에 해당 메서드가 없다면 직접 필드에 접근
+        // 임시로 리플렉션을 사용하지 않고 엔티티 수정을 권장
+        updateUserLastLoginTime(user);
+    }
+    
+    /**
+     * 사용자명으로 마지막 로그인 시간 갱신
+     * 로그인 성공 시 사용자명을 통해 마지막 로그인 시간 업데이트
+     * 
+     * @param username 사용자명
+     */
+    public void updateLastLoginTimeByUsername(String username) {
+        User user = findByUsername(username);
+        updateUserLastLoginTime(user);
+    }
+    
+    /**
+     * 사용자별 마지막 로그인 시간 조회
+     * 
+     * @param userId 사용자 ID
+     * @return 마지막 로그인 시간 (없으면 null)
+     */
+    @Transactional(readOnly = true)
+    public LocalDateTime getLastLoginTime(Long userId) {
+        User user = getUserOrThrow(userId);
+        return user.getLastLoginTime();
+    }
+    
+    /**
+     * 사용자명으로 마지막 로그인 시간 조회
+     * 
+     * @param username 사용자명
+     * @return 마지막 로그인 시간 (없으면 null)
+     */
+    @Transactional(readOnly = true)
+    public LocalDateTime getLastLoginTimeByUsername(String username) {
+        User user = findByUsername(username);
+        return user.getLastLoginTime();
+    }
+    
+    /**
+     * 실제 마지막 로그인 시간 업데이트 수행
+     * User 엔티티의 lastLoginTime 필드를 현재 시간으로 설정
+     * 
+     * @param user 업데이트할 사용자 엔티티
+     */
+    private void updateUserLastLoginTime(User user) {
+        // User 엔티티의 updateLastLoginTime() 메서드 사용
+        user.updateLastLoginTime();
+        
+        // 변경사항 저장
+        userRepository.save(user);
+    }
+    
+    /**
+     * 특정 기간 이후 로그인하지 않은 사용자 조회
+     * 
+     * @param days 일수 (예: 30일)
+     * @return 오랫동안 로그인하지 않은 사용자 목록
+     */
+    @Transactional(readOnly = true)
+    public List<User> findUsersNotLoggedInSince(int days) {
+        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(days);
+        
+        return userRepository.findAll()
+                .stream()
+                .filter(User::isActive) // 활성 사용자만
+                .filter(user -> {
+                    LocalDateTime lastLogin = user.getLastLoginTime();
+                    // 한 번도 로그인하지 않았거나, cutoffDate 이전에 로그인한 경우
+                    return lastLogin == null || lastLogin.isBefore(cutoffDate);
+                })
+                .collect(Collectors.toList());
+    }
+
 }

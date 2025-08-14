@@ -39,14 +39,17 @@ public class User {
     @Builder.Default
     private Boolean isActive = true;
     
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-    
     @Column(length = 100)
     private String realName; // 실명
     
     @Column(length = 50)
     private String department; // 부서
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Column(name = "last_login_time")
+    private LocalDateTime lastLoginTime;
 
     // ========================= 비즈니스 메서드들 =========================
     
@@ -339,6 +342,28 @@ public class User {
     public void updateDepartment(String department) {
         if (department != null) {
             this.department = department.trim().isEmpty() ? null : department.trim();
+            this.updatedAt = LocalDateTime.now();
+        }
+    }
+    
+    /**
+     * 마지막 로그인 시간 업데이트
+     * 로그인 성공 시 호출되는 메서드
+     */
+    public void updateLastLoginTime() {
+        LocalDateTime now = LocalDateTime.now();
+        this.lastLoginTime = now;
+        this.updatedAt = now;
+    }
+    
+    /**
+     * 마지막 로그인 시간을 특정 시간으로 설정
+     * 
+     * @param loginTime 설정할 로그인 시간
+     */
+    public void updateLastLoginTime(LocalDateTime loginTime) {
+        if (loginTime != null) {
+            this.lastLoginTime = loginTime;
             this.updatedAt = LocalDateTime.now();
         }
     }
